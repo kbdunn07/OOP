@@ -18,7 +18,14 @@ DEFAULT_ITEMS = [
     "Five-SeveN | Angry Mob (Minimal Wear)",
     "AUG | Chameleon (Field-Tested)",
     "M4A4 | Temukau (Minimal Wear)",
-    "AK-47 | The Oligarch (Minimal Wear)"
+    "AK-47 | The Oligarch (Minimal Wear)",
+    "★ Bowie Knife | Marble Fade (Factory New)",
+    "★ Huntsman Knife | Slaughter (Minimal Wear)",
+    "★ Moto Gloves | Blood Pressure (Field-Tested)",
+    "★ Specialist Gloves | Marble Fade (Field-Tested)",
+    "★ Moto Gloves | Polygon (Field-Tested)",
+    "Sealed Genesis Terminal"
+
 ]
 
 def make_price_url(market_hash_name: str) -> str:
