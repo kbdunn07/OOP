@@ -1,3 +1,7 @@
+import tkinter as tk
+from sndhdr import whathdr
+from tkinter import ttk
+
 class Car:
     def __init__(self, make, model, year, color, price, repBool, count=1):
         self.make = make
@@ -106,5 +110,97 @@ class DealershipOOP:
             else:
                 print('Invalid choice.\n')
 
-app = DealershipOOP()
-app.menu()
+app=DealershipOOP()
+
+def main():
+    root = tk.Tk()
+    root.title('Dealership Application')
+    root.geometry('600x600')
+
+    notebook = ttk.Notebook(root)
+    notebook.pack(expand=True, fill='both')
+
+    # Frame Creation:
+    AddFrame = tk.Frame(notebook, width=500, height=500)
+    InventoryFrame = tk.Frame(notebook, width=500, height=500)
+    SellFrame = tk.Frame(notebook, width=500, height=500)
+    SalesFrame = tk.Frame(notebook, width=500, height=500)
+    SearchFrame = tk.Frame(notebook, width=500, height=500)
+
+    AddFrame.pack()
+    InventoryFrame.pack()
+    SellFrame.pack()
+    SalesFrame.pack()
+    SearchFrame.pack()
+
+    notebook.add(AddFrame, text='Add Car')
+    notebook.add(InventoryFrame, text='Inventory')
+    notebook.add(SellFrame, text='Sell Car')
+    notebook.add(SalesFrame, text='Sales History')
+    notebook.add(SearchFrame, text='Search Car')
+
+#<--------------------Add Car Frame------------------>:
+    makeVar=tk.StringVar()
+    modelVar=tk.StringVar()
+    yearVar=tk.StringVar()
+    colorVar=tk.StringVar()
+    priceVar=tk.StringVar()
+    repairCheck = tk.IntVar()
+
+    def submit():
+        if repairCheck.get() == 1:
+            repBool = True
+        else:
+            repBool = False
+        make=makeVar.get()
+        model=modelVar.get()
+        year=yearVar.get()
+        color=colorVar.get()
+        price=float(priceVar.get())
+        app.inventory.addCar(make, model, year, color, price, repBool, 1)
+
+    makeLabel = tk.Label(AddFrame, text='Make: ', font=('calibre',10,'bold'))
+    makeEntry = tk.Entry(AddFrame, textvariable= makeVar, font=('calibre',10,'normal'))
+
+    modelLabel = tk.Label(AddFrame, text='Model: ', font=('calibre', 10, 'bold'))
+    modelEntry = tk.Entry(AddFrame, textvariable=modelVar, font=('calibre', 10, 'normal'))
+
+    yearLabel = tk.Label(AddFrame, text='Year: ', font=('calibre',10,'bold'))
+    yearEntry = tk.Entry(AddFrame, textvariable= yearVar, font=('calibre',10,'normal'))
+
+    colorLabel = tk.Label(AddFrame, text='Color: ', font=('calibre',10,'bold'))
+    colorEntry = tk.Entry(AddFrame, textvariable= colorVar, font=('calibre',10,'normal'))
+
+    priceLabel = tk.Label(AddFrame, text='Price: $', font=('calibre',10,'bold'))
+    priceEntry = tk.Entry(AddFrame, textvariable= priceVar, font=('calibre',10,'normal'))
+
+    #repairLabel = tk.Label(AddFrame, text='Requires Repairs: ', font=('calibre',10,'bold'))
+    repairCheckbox = tk.Checkbutton(AddFrame, text='Requires Repairs', variable=repairCheck)
+
+    submitButton = tk.Button(AddFrame,text='Submit',command=submit)
+
+    makeLabel.grid(row=1,column=4)
+    makeEntry.grid(row=1, column=5)
+
+    modelLabel.grid(row=2, column=4)
+    modelEntry.grid(row=2, column=5)
+
+    yearLabel.grid(row=3, column=4)
+    yearEntry.grid(row=3, column=5)
+
+    colorLabel.grid(row=4, column=4)
+    colorEntry.grid(row=4, column=5)
+
+    priceLabel.grid(row=5, column=4)
+    priceEntry.grid(row=5, column=5)
+    repairCheckbox.grid(row=6,column=5)
+
+    submitButton.grid(row=7,column=5)
+
+# <--------------------Inventory Frame------------------>:
+
+
+
+    root.mainloop()
+if __name__=='__main__':
+    main()
