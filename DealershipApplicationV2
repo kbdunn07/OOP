@@ -54,17 +54,16 @@ class Inventory:
             return 0
 
     def sellCar(self, make, model, year, color, price, repBoolYN):
-        if repBoolYN == 'Y':
-            tempBool = True
-        else:
-            tempBool = False
+        tempBool = (repBoolYN == 'Y')
         for car in self.cars:
             if (car.make == make and car.model == model and car.year == year and
                     car.color == color and car.price == price and car.repBool == tempBool):
                 self.cars.remove(car)
                 self.sales.append(car)
                 print(f'Sold {car}')
-                return
+                return car
+        return None
+
 
 class DealershipOOP:
     def __init__(self):
@@ -86,39 +85,42 @@ def main():
     # Frame Creation:
     AddFrame = tk.Frame(notebook, width=500, height=500)
     InventoryFrame = tk.Frame(notebook, width=500, height=500)
-    #SellFrame = tk.Frame(notebook, width=500, height=500)
+
     SalesFrame = tk.Frame(notebook, width=500, height=500)
-    SearchFrame = tk.Frame(notebook, width=500, height=500)
+    #SearchFrame = tk.Frame(notebook, width=500, height=500)
 
     AddFrame.pack()
     InventoryFrame.pack()
-    #SellFrame.pack()
+
     SalesFrame.pack()
-    SearchFrame.pack()
+    #SearchFrame.pack()
 
     notebook.add(AddFrame, text='Add Car')
     notebook.add(InventoryFrame, text='Inventory')
-    #notebook.add(SellFrame, text='Sell Car')
+
     notebook.add(SalesFrame, text='Sales History')
-    notebook.add(SearchFrame, text='Search Car')
+    #notebook.add(SearchFrame, text='Search Car')
 
     def sellOnSelect():
         selected_item = tree.selection()
         if selected_item:
             item_id = selected_item[0]
             values = tree.item(item_id, "values")
+
             make = values[0]
             model = values[1]
             year = values[2]
             color = values[3]
             price = float(values[4].replace('$', '').replace(',', ''))
             repBoolYN = values[5]
+
             app.inventory.sellCar(make, model, year, color, price, repBoolYN)
             updateTab(None)
 
     def updateTab(event):
         selectedTab = notebook.select()
         print(f'Selected tab: {selectedTab}')
+        global totalSalesFinalVariableIDEK
         if selectedTab == '.!notebook.!frame2':
             for widget in tree.winfo_children():
                 widget.destroy()
@@ -130,6 +132,19 @@ def main():
                 else:
                     check = 'N'
                 tree.insert('', tk.END, text=car, values=(car.make, car.model, car.year, car.color, f'${car.price:,.2f}', check))
+        elif selectedTab == '.!notebook.!frame3':
+            for widget in Salestree.winfo_children():
+                widget.destroy()
+            for item in Salestree.get_children():
+                Salestree.delete(item)
+            for car in app.inventory.sales:
+                if car.repBool:
+                    check = 'Y'
+                else:
+                    check = 'N'
+                Salestree.insert('', tk.END, text=car, values=(car.make, car.model, car.year, car.color, f'${car.price:,.2f}', check))
+                totalSalesFinalVariableIDEK += car.price
+                totalSalesLabel.config(text=f'Total Sales: ${totalSalesFinalVariableIDEK:,.2f}')
     notebook.bind('<<NotebookTabChanged>>', updateTab)
 
 #<--------------------Add Car Frame------------------>:
@@ -158,7 +173,27 @@ def main():
         priceEntry.delete(0, tk.END)
         repairCheckbox.deselect()
 
+    def loadDefaults():
+        dummyCars = [
+            ("Toyota", "Camry", "2019", "Silver", 18500, False),
+            ("Honda", "Civic", "2020", "Blue", 19500, False),
+            ("Ford", "F-150", "2018", "Red", 27000, True),
+            ("Chevrolet", "Malibu", "2017", "Black", 15000, False),
+            ("Tesla", "Model 3", "2021", "White", 38000, False),
+            ("BMW", "X5", "2019", "Gray", 45000, True),
+            ("Audi", "A4", "2018", "Black", 28000, False),
+            ("Nissan", "Altima", "2020", "Blue", 21000, False),
+            ("Hyundai", "Tucson", "2017", "Red", 17000, True),
+            ("Kia", "Sorento", "2019", "Silver", 25000, False),
+            ("Subaru", "Outback", "2018", "Green", 23000, False),
+            ("Volkswagen", "Jetta", "2016", "White", 12000, True),
+            ("Dodge", "Charger", "2020", "Black", 30000, False),
+            ("Jeep", "Wrangler", "2019", "Yellow", 34000, True),
+            ("Mazda", "CX-5", "2021", "Red", 29000, False)
+        ]
 
+        for make, model, year, color, price, repBool in dummyCars:
+            app.inventory.addCar(make, model, year, color, price, repBool, 1)
 
     makeLabel = tk.Label(AddFrame, text='Make: ', font=('calibre',10,'bold'))
     makeEntry = tk.Entry(AddFrame, textvariable= makeVar, font=('calibre',10,'normal'))
@@ -179,7 +214,11 @@ def main():
     repairCheckbox = tk.Checkbutton(AddFrame, text='Requires Repairs', variable=repairCheck)
 
     submitButton = tk.Button(AddFrame,text='Submit',command=submit)
+    loadDefaultsButton = tk.Button(AddFrame, text='Load Defaults: Debugging Only',
 
+                                   bg='lightgray', command=loadDefaults)
+    loadDefaultsButton.grid(row=8, column=5, pady=10)
+    
     makeLabel.grid(row=1,column=4)
     makeEntry.grid(row=1, column=5)
 
@@ -217,9 +256,20 @@ def main():
     sellButton.pack(padx=10, pady=10, side=tk.LEFT, anchor='w')
 
 # <--------------------Sales Frame------------------>:
-    salesDisplay = tk.Text(SalesFrame)
-    salesDisplay.pack(fill="both", expand=True, padx=10, pady=10)
-    salesDisplay.config(state=tk.DISABLED)
+    Salestree = ttk.Treeview(SalesFrame, columns=columns, show="headings", selectmode="browse")
+    for col in columns:
+        Salestree.heading(col, text=col)
+        if col == "Make":
+            Salestree.column(col, width=100, anchor="center")
+        elif col == "Model":
+            Salestree.column(col, width=100, anchor="center")
+        elif col == 'Needs Repairs':
+            Salestree.column(col, width=50, anchor='center')
+        else:
+            Salestree.column(col, width=100, anchor="center")
+    Salestree.pack(fill="both", expand=True, padx=8, pady=6)
+
+
     totalSalesLabel = tk.Label(SalesFrame, text=f'Total Sales: ${totalSalesFinalVariableIDEK:,.2f}')
     totalSalesLabel.pack(padx=10, pady=10, anchor='center')
 
